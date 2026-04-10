@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DA Customization Intake Form</title>
+  <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+  <style>
+    :root {
+      --bg: #eef3f8;
+      --panel: #ffffff;
+      --panel-alt: #f8fbfd;
+      --text: #1f2937;
+      --muted: #5b6678;
+      --line: #d6dee8;
+      --accent: #0f4c81;
+      --accent-soft: #e8f1f8;
+      --accent-strong: #0a3558;
+      --danger: #b3261e;
+      --success: #0f7a3e;
+      --shadow: 0 18px 42px rgba(15, 76, 129, 0.08);
+      --radius: 14px;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 32px 20px;
+      background:
+        radial-gradient(circle at top left, rgba(15, 76, 129, 0.08), transparent 24%),
+        linear-gradient(180deg, #f4f8fb 0%, var(--bg) 100%);
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: var(--panel);
+      border: 1px solid rgba(15, 76, 129, 0.12);
+      border-radius: 20px;
+      padding: 0;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    h1, h2, h3 {
+      margin-top: 0;
+    }
+
+    .hero {
+      padding: 28px 32px 22px;
+      background: linear-gradient(135deg, var(--accent-strong) 0%, var(--accent) 100%);
+      color: #fff;
+    }
+
+    .hero p {
+      margin: 10px 0 0;
+      max-width: 760px;
+      color: rgba(255, 255, 255, 0.88);
+    }
+
+    form {
+      padding: 28px 32px 32px;
+    }
+
+    .section {
+      margin-bottom: 22px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--panel-alt);
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 6px;
+      color: var(--text);
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea,
+    input[type="file"] {
+      width: 100%;
+      box-sizing: border-box;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    select,
+    textarea {
+      padding: 10px 12px;
+      border: 1px solid #bcc9d8;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-family: inherit;
+      font-size: 1em;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    input[type="text"]:focus,
+    input[type="email"]:focus,
+    input[type="tel"]:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(15, 76, 129, 0.12);
+    }
+
+    .inline-options label {
+      display: inline-block;
+      font-weight: normal;
+      margin-right: 16px;
+      margin-bottom: 8px;
+    }
+
+    .conditional {
+      display: none;
+      margin-top: 12px;
+      padding: 16px;
+      border: 1px solid #d7e3ef;
+      border-radius: 12px;
+      background: #fff;
+    }
+
+    .hint {
+      font-size: 0.9em;
+      color: var(--muted);
+      margin-top: 4px;
+    }
+
+    .optional {
+      font-size: 0.84em;
+      font-weight: normal;
+      color: var(--muted);
+      margin-left: 6px;
+    }
+
+    button {
+      padding: 12px 20px;
+      border: 0;
+      border-radius: 10px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    button:hover:not(:disabled) {
+      background: var(--accent-strong);
+    }
+
+    button:disabled {
+      background: #8da6bd;
+      cursor: not-allowed;
+    }
+
+    .submit-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .status-msg {
+      flex: 1;
+      min-width: 200px;
+    }
+
+    .status-msg.error {
+      color: var(--danger);
+      font-weight: bold;
+    }
+
+    .status-msg.info {
+      color: var(--muted);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      vertical-align: middle;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .file-list {
+      margin-top: 8px;
+      font-size: 0.9em;
+      color: var(--muted);
+    }
+
+    .file-list .file-item {
+      padding: 2px 0;
+    }
+
+    .file-list .file-item.error {
+      color: var(--danger);
+    }
+
+    .honeypot {
+      position: absolute;
+      left: -9999px;
+      top: -9999px;
+      visibility: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Dynamic Application Customization Intake Form</h1>
+      <p>Please complete this form to request a new or customized SL1 Dynamic Application. Provide as much detail as you have available. Optional fields can be skipped if the information is not known yet.</p>
+    </div>
+
+    <form id="intake-form" enctype="multipart/form-data" novalidate>
+      <!-- Honeypot (bots fill this, humans don't see it) -->
+      <div class="honeypot" aria-hidden="true">
+        <label for="website">Website</label>
+        <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+      </div>
+
+      <div class="section">
+        <h2>1. Contact Information</h2>
+
+        <div class="field">
+          <label for="company">Company</label>
+          <input type="text" id="company" name="company" required>
+        </div>
+
+        <div class="field">
+          <label for="contact_person">Contact Person</label>
+          <input type="text" id="contact_person" name="contact_person" required>
+        </div>
+
+        <div class="field">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email" required>
+        </div>
+
+        <div class="field">
+          <label for="phone">Phone Number <span class="optional">(Optional)</span></label>
+          <input type="tel" id="phone" name="phone">
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>2. Request Overview</h2>
+
+        <div class="field">
+          <label for="request_title">Request Title <span class="optional">(Optional)</span></label>
+          <input type="text" id="request_title" name="request_title" placeholder="Example: Monitor Cisco Switch Health">
+        </div>
+
+        <div class="field">
+          <label for="target_system">Target System / Device / Application</label>
+          <input type="text" id="target_system" name="target_system" required>
+        </div>
+
+        <div class="field">
+          <label for="vendor_product">Vendor / Product / Model <span class="optional">(Optional)</span></label>
+          <input type="text" id="vendor_product" name="vendor_product" placeholder="Example: Cisco Catalyst 9300">
+        </div>
+
+        <div class="field">
+          <label for="business_goal">Business Goal / Monitoring Objective <span class="optional">(Optional)</span></label>
+          <textarea id="business_goal" name="business_goal" placeholder="Describe what the customer wants to monitor and why."></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>3. Collection Method</h2>
+
+        <div class="field">
+          <label for="collection_method">Preferred Collection Method</label>
+          <select id="collection_method" name="collection_method">
+            <option value="">Select</option>
+            <option value="snmp">SNMP</option>
+            <option value="ssh">SSH</option>
+            <option value="powershell">PowerShell / WinRM</option>
+            <option value="rest">REST API</option>
+            <option value="database">Database</option>
+            <option value="recommend">Not sure - please recommend</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="access_notes">Access / Connectivity Notes <span class="optional">(Optional)</span></label>
+          <textarea id="access_notes" name="access_notes" placeholder="Any information about how this target is normally accessed."></textarea>
+        </div>
+
+        <div id="section-snmp" class="conditional">
+          <h3>SNMP Details</h3>
+          <div class="field">
+            <label for="snmp_version">SNMP Version <span class="optional">(Optional)</span></label>
+            <select id="snmp_version" name="snmp_version">
+              <option value="">Select</option>
+              <option>v1</option>
+              <option>v2c</option>
+              <option>v3</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="snmp_oids">Known OIDs / MIB Names <span class="optional">(Optional)</span></label>
+            <textarea id="snmp_oids" name="snmp_oids" placeholder="List any known OIDs, tables, or MIBs."></textarea>
+          </div>
+        </div>
+
+        <div id="section-ssh" class="conditional">
+          <h3>SSH Details</h3>
+          <div class="field">
+            <label for="ssh_target_type">Target Type / CLI Type <span class="optional">(Optional)</span></label>
+            <input type="text" id="ssh_target_type" name="ssh_target_type" placeholder="Example: Linux, Unix, appliance CLI">
+          </div>
+          <div class="field">
+            <label for="ssh_commands">Expected Commands <span class="optional">(Optional)</span></label>
+            <textarea id="ssh_commands" name="ssh_commands" placeholder="List commands if known."></textarea>
+          </div>
+        </div>
+
+        <div id="section-powershell" class="conditional">
+          <h3>PowerShell / WinRM Details</h3>
+          <div class="field">
+            <label for="windows_target">Windows Target Type <span class="optional">(Optional)</span></label>
+            <input type="text" id="windows_target" name="windows_target" placeholder="Example: Windows Server, IIS, SQL Server">
+          </div>
+          <div class="field">
+            <label for="powershell_metrics">Known Counters / WMI Classes / CIM Classes <span class="optional">(Optional)</span></label>
+            <textarea id="powershell_metrics" name="powershell_metrics"></textarea>
+          </div>
+        </div>
+
+        <div id="section-rest" class="conditional">
+          <h3>REST API Details</h3>
+          <div class="field">
+            <label for="api_base_url">API Base URL <span class="optional">(Optional)</span></label>
+            <input type="text" id="api_base_url" name="api_base_url" placeholder="https://api.example.com">
+          </div>
+          <div class="field">
+            <label for="api_auth">Authentication Type <span class="optional">(Optional)</span></label>
+            <select id="api_auth" name="api_auth">
+              <option value="">Select</option>
+              <option>None</option>
+              <option>Basic Auth</option>
+              <option>Bearer Token</option>
+              <option>API Key</option>
+              <option>OAuth</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="api_endpoints">Relevant API Endpoints <span class="optional">(Optional)</span></label>
+            <textarea id="api_endpoints" name="api_endpoints"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>4. Monitoring Requirements</h2>
+
+        <div class="field">
+          <label>Data Types Needed</label>
+          <div class="inline-options">
+            <label><input type="checkbox" name="data_types" value="configuration"> Configuration / Asset Info</label>
+            <label><input type="checkbox" name="data_types" value="performance"> Performance Metrics</label>
+            <label><input type="checkbox" name="data_types" value="availability"> Availability / Health</label>
+            <label><input type="checkbox" name="data_types" value="status"> Status / State</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="must_have">Must-Have Metrics / Requirements <span class="optional">(Optional)</span></label>
+          <textarea id="must_have" name="must_have" placeholder="List the required metrics, objects, or use cases."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="nice_to_have">Nice-to-Have Metrics / Requirements <span class="optional">(Optional)</span></label>
+          <textarea id="nice_to_have" name="nice_to_have" placeholder="List optional metrics or enhancements."></textarea>
+        </div>
+
+        <div class="field">
+          <label for="polling_interval">Preferred Polling Interval <span class="optional">(Optional)</span></label>
+          <select id="polling_interval" name="polling_interval">
+            <option value="">Select</option>
+            <option>1 minute</option>
+            <option>5 minutes</option>
+            <option>15 minutes</option>
+            <option>30 minutes</option>
+            <option>1 hour</option>
+            <option>Not sure - please recommend</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>5. Alerting Requirements</h2>
+
+        <div class="field">
+          <label for="alerting_mode">Alerting Preference</label>
+          <select id="alerting_mode" name="alerting_mode">
+            <option value="">Select</option>
+            <option value="default">Use recommended defaults</option>
+            <option value="custom">Custom alerting requirements</option>
+            <option value="collection_only">Data collection only - no alerting</option>
+          </select>
+        </div>
+
+        <div id="section-alert-custom" class="conditional">
+          <div class="field">
+            <label for="alert_metrics">Which metrics should alert? <span class="optional">(Optional)</span></label>
+            <textarea id="alert_metrics" name="alert_metrics" placeholder="Example: CPU, memory, interface down, API response time"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="alert_thresholds">Threshold Details <span class="optional">(Optional)</span></label>
+            <textarea id="alert_thresholds" name="alert_thresholds" placeholder="Example: CPU Critical > 90%, Memory Critical > 85%"></textarea>
+          </div>
+
+          <div class="field">
+            <label for="alert_severity">Severity Preference <span class="optional">(Optional)</span></label>
+            <select id="alert_severity" name="alert_severity">
+              <option value="">Select</option>
+              <option>Critical only</option>
+              <option>Minor / Major / Critical</option>
+              <option>Custom</option>
+              <option>Not sure</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>6. Sample Data and Supporting Files</h2>
+
+        <div class="field">
+          <label for="sample_data">Sample Payload / CLI Output / Example Response <span class="optional">(Optional)</span></label>
+          <textarea id="sample_data" name="sample_data" placeholder="Optional. Paste any sample output, payload, or example data here."></textarea>
+          <div class="hint">Optional, but helpful for faster design and development.</div>
+        </div>
+
+        <div class="field">
+          <label for="attachments">Upload Supporting Files <span class="optional">(Optional)</span></label>
+          <input type="file" id="attachments" name="attachments" multiple>
+          <div class="hint">Examples: MIB files, screenshots, API docs, spreadsheets, sample outputs, requirement documents. Max 5 files, 10 MB per file, 25 MB total.</div>
+          <div id="file-list" class="file-list"></div>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>7. Additional Notes</h2>
+
+        <div class="field">
+          <label for="additional_notes">Additional Comments <span class="optional">(Optional)</span></label>
+          <textarea id="additional_notes" name="additional_notes"></textarea>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>8. Verification</h2>
+        <!-- Turnstile widget - replace data-sitekey with your real site key -->
+        <div class="cf-turnstile" data-sitekey="YOUR_TURNSTILE_SITE_KEY"></div>
+      </div>
+
+      <div class="submit-row">
+        <button type="submit" id="submit-btn">Submit Request</button>
+        <div id="status-msg" class="status-msg"></div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // ====== CONFIG - EDIT THIS ======
+    var WORKER_URL = "https://YOUR-WORKER-NAME.YOUR-SUBDOMAIN.workers.dev/submit";
+    // =================================
+
+    var MAX_FILE_SIZE = 10 * 1024 * 1024;   // 10 MB
+    var MAX_FILES = 5;
+    var MAX_TOTAL_SIZE = 25 * 1024 * 1024;  // 25 MB
+
+    function toggleMethodSections() {
+      var method = document.getElementById("collection_method").value;
+      var sections = ["section-snmp", "section-ssh", "section-powershell", "section-rest"];
+      sections.forEach(function (id) {
+        document.getElementById(id).style.display = "none";
+      });
+      if (method === "snmp")       document.getElementById("section-snmp").style.display = "block";
+      if (method === "ssh")        document.getElementById("section-ssh").style.display = "block";
+      if (method === "powershell") document.getElementById("section-powershell").style.display = "block";
+      if (method === "rest")       document.getElementById("section-rest").style.display = "block";
+    }
+
+    function toggleAlertSection() {
+      var mode = document.getElementById("alerting_mode").value;
+      document.getElementById("section-alert-custom").style.display = (mode === "custom") ? "block" : "none";
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024) return bytes + " B";
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+      return (bytes / (1024 * 1024)).toFixed(2) + " MB";
+    }
+
+    function validateFiles() {
+      var input = document.getElementById("attachments");
+      var listDiv = document.getElementById("file-list");
+      var files = input.files;
+      var html = "";
+      var totalSize = 0;
+      var err = null;
+
+      if (files.length > MAX_FILES) {
+        err = "Too many files. Max " + MAX_FILES + " files allowed.";
+      }
+
+      for (var i = 0; i < files.length; i++) {
+        var f = files[i];
+        totalSize += f.size;
+        var fileErr = (f.size > MAX_FILE_SIZE) ? " — exceeds 10 MB limit!" : "";
+        var cls = fileErr ? "file-item error" : "file-item";
+        html += '<div class="' + cls + '">• ' + escapeHtml(f.name) + ' (' + formatSize(f.size) + ')' + escapeHtml(fileErr) + '</div>';
+        if (fileErr) err = "One or more files exceed the 10 MB limit.";
+      }
+
+      if (totalSize > MAX_TOTAL_SIZE) {
+        err = "Total upload size (" + formatSize(totalSize) + ") exceeds 25 MB limit.";
+      }
+
+      if (files.length > 0) {
+        html += '<div class="file-item">Total: ' + formatSize(totalSize) + '</div>';
+      }
+      listDiv.innerHTML = html;
+      return err;
+    }
+
+    function escapeHtml(s) {
+      return String(s || "").replace(/[&<>"']/g, function (c) {
+        return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+      });
+    }
+
+    function setStatus(msg, type) {
+      var el = document.getElementById("status-msg");
+      el.className = "status-msg " + (type || "info");
+      el.textContent = msg || "";
+    }
+
+    function handleSubmit(e) {
+      e.preventDefault();
+      setStatus("");
+
+      // Honeypot check (silent fail for bots)
+      if (document.getElementById("website").value) {
+        setStatus("Thank you.", "info");
+        return;
+      }
+
+      // Required fields
+      var required = ["company", "contact_person", "email", "target_system"];
+      for (var i = 0; i < required.length; i++) {
+        var el = document.getElementById(required[i]);
+        if (!el.value.trim()) {
+          setStatus("Please fill in all required fields.", "error");
+          el.focus();
+          return;
+        }
+      }
+
+      // Email format
+      var email = document.getElementById("email").value.trim();
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        setStatus("Please enter a valid email address.", "error");
+        document.getElementById("email").focus();
+        return;
+      }
+
+      // File validation
+      var fileErr = validateFiles();
+      if (fileErr) {
+        setStatus(fileErr, "error");
+        return;
+      }
+
+      // Turnstile check
+      var tsResponse = "";
+      var tsField = document.querySelector('input[name="cf-turnstile-response"]');
+      if (tsField) tsResponse = tsField.value;
+      if (!tsResponse) {
+        setStatus("Please complete the verification check.", "error");
+        return;
+      }
+
+      var btn = document.getElementById("submit-btn");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Submitting...';
+      setStatus("Uploading your request, please wait...", "info");
+
+      var form = document.getElementById("intake-form");
+      var fd = new FormData(form);
+
+      fetch(WORKER_URL, {
+        method: "POST",
+        body: fd
+      })
+        .then(function (res) {
+          return res.json().then(function (data) {
+            return { status: res.status, data: data };
+          });
+        })
+        .then(function (result) {
+          if (result.status === 200 && result.data && result.data.ok) {
+            window.location.href = "success.html";
+          } else {
+            var errMsg = (result.data && result.data.error) ? result.data.error : "Submission failed. Please try again.";
+            setStatus("Error: " + errMsg, "error");
+            btn.disabled = false;
+            btn.innerHTML = "Submit Request";
+            if (window.turnstile) window.turnstile.reset();
+          }
+        })
+        .catch(function (err) {
+          setStatus("Network error: " + err.message, "error");
+          btn.disabled = false;
+          btn.innerHTML = "Submit Request";
+          if (window.turnstile) window.turnstile.reset();
+        });
+    }
+
+    document.getElementById("collection_method").addEventListener("change", toggleMethodSections);
+    document.getElementById("alerting_mode").addEventListener("change", toggleAlertSection);
+    document.getElementById("attachments").addEventListener("change", function () { validateFiles(); });
+    document.getElementById("intake-form").addEventListener("submit", handleSubmit);
+
+    toggleMethodSections();
+    toggleAlertSection();
+  </script>
+</body>
+</html>
